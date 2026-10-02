@@ -1,11 +1,19 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeSlash, Lock, Envelope } from "@phosphor-icons/react";
+import {
+  Eye,
+  EyeSlash,
+  Lock,
+  Envelope,
+  Drop,
+} from "@phosphor-icons/react";
 import toast from "react-hot-toast";
 
 import AuthService from "../../../api/AuthService";
 import useAuth from "../../../hooks/useAuth";
+import logo from "../../../assets/logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -68,45 +76,76 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-[var(--border)] bg-white p-8 shadow-sm">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-white via-red-50 to-red-100 px-4 py-10">
+      {/* Decorative background shapes */}
+      <div className="pointer-events-none absolute -left-28 -top-28 h-80 w-80 rounded-full bg-red-200/30 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-red-300/25 blur-3xl" />
 
-          {/* Header */}
+      <div className="relative z-10 w-full max-w-md">
+        {/* Center Logo */}
+        <Link
+          to="/"
+          className="mb-8 flex flex-col items-center justify-center"
+        >
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-red-900/10 ring-1 ring-red-100">
+            <img
+              src={logo}
+              alt="Blood Care Logo"
+              className="h-full w-full object-contain p-2"
+            />
+          </div>
 
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-[var(--primary)]">
-              Blood Care
-            </h1>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[var(--primary)]">
+            Blood Care
+          </h1>
 
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Login to your account
+          <p className="mt-1 text-xs font-medium tracking-[0.16em] text-slate-500">
+            BLOOD BANK MANAGEMENT SYSTEM
+          </p>
+        </Link>
+
+        {/* Login Form */}
+        <div className="rounded-2xl border border-white/80 bg-white/90 p-6 shadow-xl shadow-red-950/5 backdrop-blur-sm sm:p-8">
+          <div className="mb-7 text-center">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-[var(--primary)]">
+              <Lock size={22} weight="duotone" />
+            </div>
+
+            <h2 className="text-2xl font-bold text-slate-800">
+              Sign in to your account
+            </h2>
+
+            <p className="mt-2 text-sm text-slate-500">
+              Welcome back! Please enter your details.
             </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
             {/* Email */}
-
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
-                Email
+              <label
+                htmlFor="email"
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
+                Email address
               </label>
 
               <div className="relative">
                 <Envelope
-                  size={20}
+                  size={19}
                   weight="regular"
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                 />
 
                 <input
+                  id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-red-100 ${
+                  autoComplete="email"
+                  className={`w-full rounded-lg border bg-red-50/40 py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition duration-200 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-red-100 ${
                     errors.email
                       ? "border-red-500"
-                      : "border-[var(--border)]"
+                      : "border-slate-200 focus:border-[var(--primary)]"
                   }`}
                   {...register("email", {
                     required: "Email is required",
@@ -119,33 +158,37 @@ const Login = () => {
               </div>
 
               {errors.email && (
-                <p className="mt-1 text-sm text-red-500">
+                <p className="mt-1.5 text-xs text-red-600">
                   {errors.email.message}
                 </p>
               )}
             </div>
 
             {/* Password */}
-
             <div>
-              <label className="mb-2 block text-sm font-semibold text-[var(--text-primary)]">
+              <label
+                htmlFor="password"
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
                 Password
               </label>
 
               <div className="relative">
                 <Lock
-                  size={20}
+                  size={19}
                   weight="regular"
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                 />
 
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className={`w-full rounded-xl border bg-white py-3 pl-11 pr-12 outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-red-100 ${
+                  autoComplete="current-password"
+                  className={`w-full rounded-lg border bg-red-50/40 py-3 pl-11 pr-12 text-sm text-slate-800 outline-none transition duration-200 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-red-100 ${
                     errors.password
                       ? "border-red-500"
-                      : "border-[var(--border)]"
+                      : "border-slate-200 focus:border-[var(--primary)]"
                   }`}
                   {...register("password", {
                     required: "Password is required",
@@ -154,8 +197,11 @@ const Login = () => {
 
                 <button
                   type="button"
+                  aria-label={
+                    showPassword ? "Hide password" : "Show password"
+                  }
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-[var(--primary)]"
                 >
                   {showPassword ? (
                     <EyeSlash size={20} />
@@ -166,37 +212,59 @@ const Login = () => {
               </div>
 
               {errors.password && (
-                <p className="mt-1 text-sm text-red-500">
+                <p className="mt-1.5 text-xs text-red-600">
                   {errors.password.message}
                 </p>
               )}
             </div>
 
             {/* Submit */}
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-[var(--primary)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--primary-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+              className="group flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-red-900/15 transition duration-300 hover:-translate-y-0.5 hover:bg-[var(--primary-dark)] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  Logging in...
+                </>
+              ) : (
+                "SIGN IN"
+              )}
             </button>
           </form>
 
           {/* Register */}
+          <div className="mt-6 border-t border-slate-100 pt-5 text-center">
+            <p className="text-sm text-slate-500">
+              New to Blood Care?{" "}
+              <Link
+                to="/register"
+                className="font-bold text-[var(--primary)] transition hover:text-[var(--primary-dark)] hover:underline"
+              >
+                Create account
+              </Link>
+            </p>
+          </div>
+        </div>
 
-          <p className="mt-6 text-center text-sm text-[var(--text-secondary)]">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="font-semibold text-[var(--primary)] hover:underline"
-            >
-              Create account
-            </Link>
+        {/* Footer */}
+        <div className="mt-7 text-center">
+          <p className="flex items-center justify-center gap-1.5 text-xs text-slate-500">
+            <Drop size={15} weight="fill" className="text-[var(--primary)]" />
+            Every drop matters. Every life counts.
           </p>
+
+          <Link
+            to="/"
+            className="mt-3 inline-block text-xs font-medium text-slate-500 transition hover:text-[var(--primary)]"
+          >
+            © {new Date().getFullYear()} Blood Care. All rights reserved.
+          </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -19,13 +19,21 @@ import ManageDonors from "../components/pages/admin/ManageDonors";
 import BloodInventory from "../components/pages/admin/BloodInventory";
 import BloodRequests from "../components/pages/admin/BloodRequests";
 import Donations from "../components/pages/admin/Donations";
+import PublicLayout from "../components/layout/PublicLayout";
+import HomeComponent from "../components/pages/home/HomeComponent";
+import ContactComponent from "../components/pages/contact/ContactComponent";
+import AboutComponent from "../components/pages/about/AboutComponent";
 
 const AllRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
 
-      {/* <Route path="/" element={<Home />} /> */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomeComponent/>} />
+        <Route path="/about" element={<AboutComponent />} />
+        <Route path="/contact" element={<ContactComponent />} />
+      </Route>
 
       <Route path="/login" element={<Login />} />
 
