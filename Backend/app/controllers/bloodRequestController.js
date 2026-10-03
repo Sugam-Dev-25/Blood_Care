@@ -1,6 +1,7 @@
 const BloodRequest = require("../models/BloodRequest");
 const Hospital = require("../models/Hospital");
 const BloodInventory = require("../models/BloodInventory");
+const sendEmail = require("../utils/sendEmail");
 
 class BloodRequestController {
   // Create Blood Request
@@ -155,8 +156,34 @@ class BloodRequestController {
       // Reject request
       if (status === "rejected") {
         request.status = "rejected";
-
         await request.save();
+
+        // Send rejection email
+        try {
+          const hospital = await Hospital.findById(request.hospitalId).populate(
+            "userId",
+            "name email",
+          );
+
+          if (hospital?.userId?.email) {
+            await sendEmail(
+              hospital.userId.email,
+              "Blood Care - Blood Request Rejected",
+              `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                  <h2 style="color: #a61f1f;">Blood Care</h2>
+                  <p>Hello ${hospital.userId.name || "Hospital"},</p>
+                  <p>Your blood request has been <strong>rejected</strong>.</p>
+                  <p><strong>Blood Group:</strong> ${request.bloodGroup}</p>
+                  <p><strong>Units Requested:</strong> ${request.units}</p>
+                  <p>Please contact the Blood Care administration team for further information.</p>
+                </div>
+              `,
+            );
+          }
+        } catch (emailError) {
+          console.error("Request rejection email failed:", emailError);
+        }
 
         return res.status(200).json({
           success: true,
@@ -187,13 +214,39 @@ class BloodRequestController {
 
       // Deduct requested units
       blood.units = blood.units - request.units;
-
       await blood.save();
 
       // Approve request
       request.status = "approved";
-
       await request.save();
+
+      // Send approval email
+      try {
+        const hospital = await Hospital.findById(request.hospitalId).populate(
+          "userId",
+          "name email",
+        );
+
+        if (hospital?.userId?.email) {
+          await sendEmail(
+            hospital.userId.email,
+            "Blood Care - Blood Request Approved",
+            `
+              <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <h2 style="color: #a61f1f;">Blood Care</h2>
+                <p>Hello ${hospital.userId.name || "Hospital"},</p>
+                <p>Your blood request has been <strong>approved</strong>.</p>
+                <p><strong>Blood Group:</strong> ${request.bloodGroup}</p>
+                <p><strong>Units Requested:</strong> ${request.units}</p>
+                <p>Your request has been processed successfully.</p>
+                <p>Thank you for using Blood Care.</p>
+              </div>
+            `,
+          );
+        }
+      } catch (emailError) {
+        console.error("Request approval email failed:", emailError);
+      }
 
       return res.status(200).json({
         success: true,
@@ -204,7 +257,7 @@ class BloodRequestController {
     } catch (error) {
       console.error("Update Blood Request Status Error:", error);
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "Server error",
       });

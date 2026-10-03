@@ -11,6 +11,7 @@ import {
   UserCircle,
   Hospital,
   Drop,
+  MapPin,
 } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
 
@@ -33,6 +34,7 @@ const Register = () => {
       name: "",
       email: "",
       phone: "",
+      address: "",
       password: "",
       confirmPassword: "",
       role: "donor",
@@ -81,10 +83,7 @@ const Register = () => {
 
       <div className="relative z-10 w-full max-w-md">
         {/* Center Logo */}
-        <Link
-          to="/"
-          className="mb-7 flex flex-col items-center justify-center"
-        >
+        <Link to="/" className="mb-7 flex flex-col items-center justify-center">
           <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-red-900/10 ring-1 ring-red-100">
             <img
               src={logo}
@@ -230,6 +229,43 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Address */}
+            <div>
+              <label
+                htmlFor="address"
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
+                Address
+              </label>
+
+              <div className="relative">
+                <MapPin
+                  size={19}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+                <input
+                  id="address"
+                  type="text"
+                  placeholder="Enter your address"
+                  autoComplete="street-address"
+                  className="w-full rounded-lg border border-slate-200 bg-red-50/40 py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition duration-200 placeholder:text-slate-400 focus:border-[var(--primary)] focus:bg-white focus:ring-2 focus:ring-red-100"
+                  {...register("address", {
+                    required: "Address is required",
+                    minLength: {
+                      value: 5,
+                      message: "Address must be at least 5 characters",
+                    },
+                  })}
+                />
+              </div>
+
+              {errors.address && (
+                <p className="mt-1.5 text-xs text-red-600">
+                  {errors.address.message}
+                </p>
+              )}
+            </div>
+
             {/* Role Selection */}
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -341,11 +377,7 @@ const Register = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-[var(--primary)]"
                 >
-                  {showPassword ? (
-                    <EyeSlash size={20} />
-                  ) : (
-                    <Eye size={20} />
-                  )}
+                  {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
                 </button>
               </div>
 
@@ -447,4 +479,3 @@ const Register = () => {
 };
 
 export default Register;
-

@@ -3,6 +3,7 @@ const User = require("../models/User");
 const DonorProfile = require("../models/DonorProfile");
 const BloodInventory = require("../models/BloodInventory");
 const BloodRequest = require("../models/BloodRequest");
+const sendEmail = require("../utils/sendEmail");
 
 class AdminController {
   // Get All Hospitals
@@ -40,7 +41,10 @@ class AdminController {
         });
       }
 
-      const hospital = await Hospital.findById(id);
+      const hospital = await Hospital.findById(id).populate(
+        "userId",
+        "name email",
+      );
 
       if (!hospital) {
         return res.status(404).json({
@@ -57,10 +61,45 @@ class AdminController {
       }
 
       hospital.status = status;
-
       await hospital.save();
 
-      res.status(200).json({
+      // Send email notification
+      if (hospital.userId?.email) {
+        const hospitalName = hospital.userId.name || "Hospital";
+
+        const subject =
+          status === "approved"
+            ? "Blood Care - Hospital Account Approved"
+            : "Blood Care - Hospital Account Rejected";
+
+        const emailMessage =
+          status === "approved"
+            ? `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+              <h2 style="color: #a61f1f;">Blood Care</h2>
+              <p>Hello ${hospitalName},</p>
+              <p>Your hospital account has been <strong>approved</strong>.</p>
+              <p>You can now log in and use Blood Care hospital services.</p>
+              <p>Thank you for joining Blood Care.</p>
+            </div>
+          `
+            : `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+              <h2 style="color: #a61f1f;">Blood Care</h2>
+              <p>Hello ${hospitalName},</p>
+              <p>Your hospital account has been <strong>rejected</strong>.</p>
+              <p>Please contact the Blood Care administration team for further information.</p>
+            </div>
+          `;
+
+        try {
+          await sendEmail(hospital.userId.email, subject, emailMessage);
+        } catch (emailError) {
+          console.error("Hospital notification email failed:", emailError);
+        }
+      }
+
+      return res.status(200).json({
         success: true,
         message: `Hospital ${status} successfully`,
         hospital,
@@ -68,7 +107,7 @@ class AdminController {
     } catch (error) {
       console.error("Update Hospital Status Error:", error);
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "Server error",
       });
