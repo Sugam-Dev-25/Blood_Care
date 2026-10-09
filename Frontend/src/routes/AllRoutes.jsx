@@ -23,6 +23,7 @@ import PublicLayout from "../components/layout/PublicLayout";
 import HomeComponent from "../components/pages/home/HomeComponent";
 import ContactComponent from "../components/pages/contact/ContactComponent";
 import AboutComponent from "../components/pages/about/AboutComponent";
+import AuditLogs from "../components/pages/admin/AuditLogs";
 
 const AllRoutes = () => {
   return (
@@ -76,6 +77,8 @@ const AllRoutes = () => {
             <Route path="/admin/inventory" element={<BloodInventory />} />
             <Route path="/admin/requests" element={<BloodRequests />} />
             <Route path="/admin/donations" element={<Donations />} />
+            <Route path="/admin/audit-logs" element={<AuditLogs/>} />
+
           </Route>
         </Route>
       </Route>

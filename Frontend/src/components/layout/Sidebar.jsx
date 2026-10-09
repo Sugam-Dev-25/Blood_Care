@@ -87,6 +87,12 @@ const Sidebar = () => {
         path: "/admin/donations",
         icon: Drop,
       },
+
+      {
+        label: "Audit Logs",
+        path: "/admin/audit-logs",
+        icon: ClipboardText,
+      },
     ],
   };
 
