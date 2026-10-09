@@ -31,10 +31,7 @@ const AdminService = {
 
   // Get donor profiles
   getAllDonorProfiles: async () => {
-    const response = await Api.get(
-      "/admin/donor-profiles"
-    );
-
+    const response = await Api.get("/admin/donor-profiles");
     return response.data;
   },
 
@@ -44,6 +41,15 @@ const AdminService = {
       `/admin/donors/${donorId}/status`,
       { status }
     );
+
+    return response.data;
+  },
+
+  // Get audit logs
+  getAuditLogs: async (params = {}) => {
+    const response = await Api.get("/admin/audit-logs", {
+      params,
+    });
 
     return response.data;
   },

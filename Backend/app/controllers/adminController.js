@@ -4,9 +4,10 @@ const DonorProfile = require("../models/DonorProfile");
 const BloodInventory = require("../models/BloodInventory");
 const BloodRequest = require("../models/BloodRequest");
 const sendEmail = require("../utils/sendEmail");
+const AuditLog = require("../models/AuditLog");
 
 class AdminController {
-  // Get All Hospitals
+
   getAllHospitals = async (req, res) => {
     try {
       const hospitals = await Hospital.find()
@@ -232,6 +233,69 @@ class AdminController {
       res.status(500).json({
         success: false,
         message: "Server error",
+      });
+    }
+  };
+
+  getAuditLogs = async (req, res) => {
+    try {
+      const { page = 1, limit = 10, action, status, search } = req.query;
+
+      const currentPage = Math.max(1, parseInt(page, 10) || 1);
+      const pageLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
+
+      const filter = {};
+
+      // Filter by action
+      if (action) {
+        filter.action = action;
+      }
+
+      // Filter by status
+      if (["success", "failed"].includes(status)) {
+        filter.status = status;
+      }
+
+      // Search by username, action, resource or description
+      if (search) {
+        const searchRegex = new RegExp(
+          search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i",
+        );
+
+        filter.$or = [
+          { userName: searchRegex },
+          { action: searchRegex },
+          { resource: searchRegex },
+          { description: searchRegex },
+        ];
+      }
+
+      const totalLogs = await AuditLog.countDocuments(filter);
+
+      const logs = await AuditLog.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((currentPage - 1) * pageLimit)
+        .limit(pageLimit)
+        .lean();
+
+      return res.status(200).json({
+        success: true,
+        message: "Audit logs fetched successfully",
+        logs,
+        pagination: {
+          currentPage,
+          limit: pageLimit,
+          totalLogs,
+          totalPages: Math.ceil(totalLogs / pageLimit),
+        },
+      });
+    } catch (error) {
+      console.error("Get Audit Logs Error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to fetch audit logs",
       });
     }
   };

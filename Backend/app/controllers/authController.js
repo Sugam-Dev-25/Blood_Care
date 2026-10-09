@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
+const createAuditLog = require("../utils/auditLogger");
 
 class AuthController {
   register = async (req, res) => {
@@ -37,6 +38,20 @@ class AuthController {
         phone,
         role,
         address,
+      });
+
+      await createAuditLog({
+        req,
+        user: {
+          id: user._id,
+          name: user.name,
+          role: user.role,
+        },
+        action: "USER_REGISTER",
+        resource: "User",
+        resourceId: user._id,
+        description: `${user.name} registered successfully`,
+        status: "success",
       });
 
       // Send registration confirmation email
@@ -128,6 +143,20 @@ class AuthController {
           expiresIn: "1d",
         },
       );
+
+      await createAuditLog({
+        req,
+        user: {
+          id: user._id,
+          name: user.name,
+          role: user.role,
+        },
+        action: "USER_LOGIN",
+        resource: "User",
+        resourceId: user._id,
+        description: `${user.name} logged in successfully`,
+        status: "success",
+      });
 
       res.status(200).json({
         success: true,
